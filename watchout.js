@@ -1,12 +1,6 @@
 var width = 700;
 var height = 450;
 var gameSpeed = 3000;
-
-var axes = {
-  x: d3.scale.linear().domain([0,100]).range([0,width]),
-  y: d3.scale.linear().domain([0,100]).range([0,height])
-}
-
 var enemyColors = ["black"];
 
 var gameboard = d3.select(".container").append("svg")
@@ -23,7 +17,7 @@ var setYPos = function(){
 var createEnemies = function(numberOfEmemies) {
   var enemies = [];
   for (var i=0; i<numberOfEmemies; i++) {
-    var enemy = {id: i, x: setXPos(), y: setYPos(), color: enemyColors[Math.floor(Math.random() * 5 | 0)]};
+    var enemy = {id: i, r: 10, x: setXPos(), y: setYPos(), color: enemyColors[Math.floor(Math.random() * 5 | 0)]};
     enemies.push(enemy);
   }
   return enemies;
@@ -41,7 +35,8 @@ var enemies = createEnemies(30);
 
 var move = function() {
   d3.select(this)
-  .attr("transform", "translate(" + d3.event.x + "," + d3.event.y  + ")");
+  .attr("cx", d3.event.x)
+  .attr("cy", d3.event.y);
 };
 
 var playerCircles = gameboard.selectAll("circle")
@@ -65,48 +60,21 @@ var enemyCircles = gameboard.selectAll("circle")
 var circleAttributes = enemyCircles
   .attr("cx", function (d) { return d.x; })
   .attr("cy", function (d) { return d.y; })
-  .attr("r", 10)
+  .attr("r", function(d) { return d.r; })
   .attr("class", "enemy")
   .style("fill", function(d){return d.color;});
 
-var checkCollision = function(enemy){
-  //debugger;
-  var radiusSum = parseFloat(enemy.attr("r")) + player.r;
-  var xDiff = parseFloat(enemy.attr("cx")) - player.x;
-  var yDiff = parseFloat(enemy.attr("cy")) - player.y;
 
-  var separation = Math.sqrt( Math.pow(xDiff,2) + Math.pow(yDiff,2) );
-
-  if(separation < radiusSum){
-    console.log("HITTTT!!");
-  }
+var checkCollision = function(){
+  d3.selectAll(".enemy").each(function(enemy){
+    var radiusSum =  enemy.r + player.r;
+    var xDiff = d3.select(this).attr("cx") - d3.select(".player").attr("cx");
+    var yDiff = d3.select(this).attr("cy") - d3.select(".player").attr("cy");
+    console.log(d3.select(".player").attr("cx"));
+  });
 };
 
-var tweenWithCollisionDetection = function(endData) {
-  var enemy = d3.select(this);
-
-  var startPos = {
-    x: parseFloat(enemy.attr("cx")),
-    y: parseFloat(enemy.attr("cy"))
-  };
-
-  var endPos = {
-    x: axes.x(endData.x),
-    y: axes.y(endData.y)
-  };
-
-  return function(t) {
-    checkCollision(enemy);
-    var enemyNextPos = {
-      x: startPos.x + (endPos.x - startPos.x)*t,
-      y: startPos.y + (endPos.y - startPos.y)*t
-    };
-    enemy.attr("cx", enemyNextPos.x)
-      .attr("cy", enemyNextPos.y);
-  };
-
-};
-
+// d3.select(d3.selectAll(".enemy")).attr("cx")
 
 
 window.setInterval(function(){
@@ -117,8 +85,7 @@ window.setInterval(function(){
     })
     .attr("cy", function(d){
       return setYPos();
-    })
-    .tween("custom", tweenWithCollisionDetection);
+    });
 
 },gameSpeed);
 
