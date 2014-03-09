@@ -29,3 +29,24 @@ body {
   text-align: right;
   border-radius: 3px;
 }
+
+.barChartContainer {
+  border: 1px solid black;
+  margin-top: 50px;
+  overflow: hidden;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.barChartContainer div {
+  font: 16px sans-serif;
+  background-color: steelblue;
+  text-align: left;
+  line-height: 30px;
+  padding: 3px;
+  margin: 1px;
+  color: black;
+  height: 30px;
+
+}

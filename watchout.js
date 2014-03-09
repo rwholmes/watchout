@@ -3,10 +3,10 @@
 var width = 700;
 var height = 450;
 var gameSpeed = 1000;
-var enemyColors = ["black"];
 var count = 0;
 var score = 0;
 var highScore = 0;
+var scoresData = [0,0,0];
 
 var gameboard = d3.select(".container").append("svg")
   .attr("width", width)
@@ -22,7 +22,7 @@ var setYPos = function(){
 var createEnemies = function(numberOfEmemies) {
   var enemies = [];
   for (var i=0; i<numberOfEmemies; i++) {
-    var enemy = {id: i, r: 10, x: setXPos(), y: setYPos(), color: enemyColors[Math.floor(Math.random() * 5 | 0)]};
+    var enemy = {id: i, r: 10, x: setXPos(), y: setYPos()};
     enemies.push(enemy);
   }
   return enemies;
@@ -66,8 +66,7 @@ var circleAttributes = enemyCircles
   .attr("cx", function (d) { return d.x; })
   .attr("cy", function (d) { return d.y; })
   .attr("r", function(d) { return d.r; })
-  .attr("class", "enemy")
-  .style("fill", function(d){return d.color;});
+  .attr("class", "enemy");
 
 
 var checkCollision = function(){
@@ -81,6 +80,11 @@ var checkCollision = function(){
       if(score > highScore){
         highScore = score;
         d3.select(".high span").html(highScore);
+        scoresData.unshift(highScore);
+        scoresData.pop();
+
+        d3.select(".barChartContainer").selectAll("div").data(scoresData).style("width", function(d) {
+      return d + "px";}).text(function(d){return d;});
       }
       score = 0;
     }
@@ -108,4 +112,49 @@ window.setInterval(function(){
     });
 
 },gameSpeed);
+
+
+var barChartContainer = d3.select(".container").append("div")
+  .attr("class", "barChartContainer")
+  .attr("width", width)
+  .attr("height", height/2);
+
+d3.select(".barChartContainer")
+  .selectAll("div")
+    .data(scoresData)
+  .enter().append("div")
+    .style("width", function(d) {
+      return d + "px";})
+    .text(function(d){return d;});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
